@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> <title>Show</title></head>
+<body>
+    <header>
+        <a href="/">HOME</a> | <a href="/new">NEW</a>
+        <div> <span><h2>details</h2></span> </div>
+    </header>
+    <div>
+        <h2> Register_id: {{ .Id }} </h2>
+        <p>Name: {{ .Name }}</p>
+        <p>Dept: {{ .Dept }}</p>
+        <p>City:  {{ .City }}</p>
+        <p>Sal: {{ .Sal }}</p><br /> <a href="/edit?id={{ .Id }}">Edit</a></p>
+    </div>
+</body>
+</html>

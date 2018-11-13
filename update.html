@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Update</title>
+</head>
+<body>
+<main>
+    <header>
+        <div>
+            <h1 style="background: lightgrey">Update records</h1>
+        </div>
+        <div>
+            <a href="/">HOME</a>
+        </div>
+        <span>
+            <h2 style="background: darkseagreen">Update records of selected id:-> </h2>
+        </span>
+        <form method="POST" action="update">
+            <input type="hidden" name="uid" value="{{ .Id }}" />
+            <label> Name </label><input type="text" name="name" value="{{ .Name }}"  /><br />
+            <label> Dept </label><input type="text" name="dept" value="{{ .Dept }}"  /><br />
+            <label> City </label><input type="text" name="city" value="{{ .City }}"  /><br />
+            <label> Sal </label><input type="int" name="sal" value="{{ .Sal }}"  /><br />
+            <input type="submit" value="Save user" />
+        </form><br />
+
+</main>
+</body>
+</html>
