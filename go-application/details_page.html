@@ -62,27 +62,16 @@
 </head>
 <body>
 <h2 style="text-align:center">Order Tables</h2>
-<p style="text-align:center">Details of your orders.</p>
+<h2 style="text-align:center">Details of your orders.</h2>
 
 <div>
-    <table border="1" >
-        <thead>
-        <tr>
-            <th scope="col">Price</th>
-            <th scope="col">Name</th>
-            <th scope="col">Storage</th>
-        </tr>
-        </thead>
-        <tbody>
-        {{ range .}}
-            <tr>
-                <td>{{ .Price }}</td>
-                <td>{{ .Name }}</td>
-                <td>{{ .Storage }}</td>
-            </tr>
-        {{ end }}
-        </tbody>
-    </table>
+    <form style="text-align: center" method="POST" action="last">
+        <input type="hidden" name="uprice" value="{{ .Price }}" />
+        <p>Name: {{ .Name}}</p>
+        <p>Storage: {{ .Storage}}</p>
+        <p>Price: {{ .Price }}</p>
+        <button type="submit">Click On Pay</button>
+    </form><br />
 </div>
 </body>
 </html>

@@ -63,7 +63,7 @@
 <body>
 
 <h2 style="text-align:center">Responsive Pricing Tables</h2>
-<p style="text-align:center">Resize the browser window to see the effect.</p>
+<p style="text-align:center">Click on Order.</p>
 
 <div class="columns">
     <table border="1" >
@@ -77,7 +77,7 @@
         {{ range .}}
             <tr>
                 <td>{{ .Price }}</td>
-                <td><a href="/login?id={{ .Price }}">Order</a></td>
+                <td><a href="/login_page?price={{ .Price }}">Order</a></td>
             </tr>
         {{ end }}
         </tbody>
