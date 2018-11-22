@@ -37,11 +37,6 @@ func dbConn() (db *sql.DB) {
 //Global variable for get selected price from order_page
 var price = " "
 
-func last_page(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("last_page.html")
-	t.Execute(w,r)
-}
-
 //Show all packages which have
 func Index(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
@@ -78,32 +73,6 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//details of selected price from oreder page and display on details page
-func orderDetails(w http.ResponseWriter, r *http.Request) {
-	db := dbConn()
-	nPrice := price
-	records, err := db.Query("SELECT * FROM details WHERE price=?", nPrice)
-	if err != nil {
-		http.Error(w, err.Error(), 502)
-		return
-	}
-	emp := Details{}
-	for records.Next() {
-		var price, name, storage string
-		err = records.Scan(&price, &name, &storage)
-		if err != nil {
-			http.Error(w, err.Error(), 502)
-			return
-		}
-		emp.Price = price
-		emp.Name = name
-		emp.Storage = storage
-	}
-	t, _ := template.ParseFiles("details_page.html")
-	t.Execute(w, emp)
-	defer db.Close()
-}
-
 //login authentication check user 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
@@ -127,6 +96,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		redirectTarget = "/login_page"
 	}
 	http.Redirect(w, r, redirectTarget, 302)
+}
+
+//New Entry template
+func newEntry(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("register_form.html")
+	t.Execute(w, nil)
 }
 
 
@@ -156,11 +131,38 @@ func adduser(w http.ResponseWriter, r *http.Request)  {
 
 }
 
-//New Entry template
-func newEntry(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("register_form.html")
-	t.Execute(w, nil)
+
+//details of selected price from oreder page and display on details page
+func orderDetails(w http.ResponseWriter, r *http.Request) {
+	db := dbConn()
+	nPrice := price
+	records, err := db.Query("SELECT * FROM details WHERE price=?", nPrice)
+	if err != nil {
+		http.Error(w, err.Error(), 502)
+		return
+	}
+	emp := Details{}
+	for records.Next() {
+		var price, name, storage string
+		err = records.Scan(&price, &name, &storage)
+		if err != nil {
+			http.Error(w, err.Error(), 502)
+			return
+		}
+		emp.Price = price
+		emp.Name = name
+		emp.Storage = storage
+	}
+	t, _ := template.ParseFiles("details_page.html")
+	t.Execute(w, emp)
+	defer db.Close()
 }
+
+func last_page(w http.ResponseWriter, r *http.Request) {
+	t, _ := template.ParseFiles("last_page.html")
+	t.Execute(w,r)
+}
+
 
 //Main function for handle all functions 
 func main() {
