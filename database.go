@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -30,18 +31,20 @@ func dbConn() (db *sql.DB) {
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
-	selDB, err := db.Query("SELECT * FROM employee ORDER BY id DESC")
+	selectAllData, err := db.Query("SELECT * FROM employee ORDER BY id DESC")
 	if err != nil {
-		panic(err.Error())
+		http.Error(w, err.Error(), 502)
+		return
 	}
 	emp := Employee{}
 	res := []Employee{}
-	for selDB.Next() {
+	for selectAllData.Next() {
 		var id, sal int
 		var name, city, dept string
-		err = selDB.Scan(&id, &name, &dept, &city, &sal)
+		err = selectAllData.Scan(&id, &name, &dept, &city, &sal)
 		if err != nil {
-			panic(err.Error())
+			http.Error(w, err.Error(), 500)
+			return
 		}
 		emp.Id = id
 		emp.Name = name
@@ -58,17 +61,19 @@ func Index(w http.ResponseWriter, r *http.Request) {
 func Show(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	nId := r.URL.Query().Get("id")
-	selDB, err := db.Query("SELECT * FROM employee WHERE id=?", nId)
+	showRecords, err := db.Query("SELECT * FROM employee WHERE id=?", nId)
 	if err != nil {
-		panic(err.Error())
+		http.Error(w, err.Error(), 502)
+		return
 	}
 	emp := Employee{}
-	for selDB.Next() {
+	for showRecords.Next() {
 		var id, sal int
 		var name, city, dept string
-		err = selDB.Scan(&id, &name, &dept, &city, &sal)
+		err = showRecords.Scan(&id, &name, &dept, &city, &sal)
 		if err != nil {
-			panic(err.Error())
+			http.Error(w, err.Error(), 502)
+			return
 		}
 		emp.Id = id
 		emp.Name = name
@@ -93,12 +98,15 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 		dept := r.FormValue("dept")
 		city := r.FormValue("city")
 		sal := r.FormValue("sal")
-		insForm, err := db.Prepare("INSERT INTO employee(name, dept, city, sal) VALUES(?,?,?,?)")
+		insertRecord, err := db.Prepare("INSERT INTO employee(name, dept, city, sal) VALUES(?,?,?,?)")
 		if err != nil {
-			panic(err.Error())
+			http.Error(w, err.Error(), 502)
+			return
 		}
-		insForm.Exec(name, dept, city, sal)
+		insertRecord.Exec(name, dept, city, sal)
 		log.Println("INSERT: Name: " + name + " | Dept: " + dept + " | City: " + city + " | Sal: " + sal)
+	}else {
+		fmt.Fprintf(w, "Method Not Found")
 	}
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
@@ -107,17 +115,19 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 func Edit(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	nId := r.URL.Query().Get("id")
-	selDB, err := db.Query("SELECT * FROM employee WHERE id=?", nId)
+	records, err := db.Query("SELECT * FROM employee WHERE id=?", nId)
 	if err != nil {
-		panic(err.Error())
+		http.Error(w, err.Error(), 502)
+		return
 	}
 	emp := Employee{}
-	for selDB.Next() {
+	for records.Next() {
 		var id, sal int
 		var name, city, dept string
-		err = selDB.Scan(&id, &name, &dept, &city, &sal)
+		err = records.Scan(&id, &name, &dept, &city, &sal)
 		if err != nil {
-			panic(err.Error())
+			http.Error(w, err.Error(), 500)
+			return
 		}
 		emp.Id = id
 		emp.Name = name
@@ -138,12 +148,15 @@ func Update(w http.ResponseWriter, r *http.Request) {
 		city := r.FormValue("city")
 		sal := r.FormValue("sal")
 		id := r.FormValue("uid")
-		insForm, err := db.Prepare("UPDATE employee SET name=?, dept=?, city=?, sal=? WHERE id=?")
+		updateRecords, err := db.Prepare("UPDATE employee SET name=?, dept=?, city=?, sal=? WHERE id=?")
 		if err != nil {
-			panic(err.Error())
+			http.Error(w, err.Error(), 502)
+			return
 		}
-		insForm.Exec(name, dept, city, sal, id)
+		updateRecords.Exec(name, dept, city, sal, id)
 		log.Println("INSERT: Name: " + name + " | Dept: " + dept + " | City: " + city + " | Sal: " + sal)
+	}else {
+		fmt.Fprintf(w, "Method Not Found")
 	}
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
@@ -152,11 +165,12 @@ func Update(w http.ResponseWriter, r *http.Request) {
 func Delete(w http.ResponseWriter, r *http.Request) {
 	db := dbConn()
 	emp := r.URL.Query().Get("id")
-	delForm, err := db.Prepare("DELETE FROM employee WHERE id=?")
+	deleteRecords, err := db.Prepare("DELETE FROM employee WHERE id=?")
 	if err != nil {
-		panic(err.Error())
+		http.Error(w, err.Error(), 502)
+		return
 	}
-	delForm.Exec(emp)
+	deleteRecords.Exec(emp)
 	log.Println("COLUMN DELETED")
 	defer db.Close()
 	http.Redirect(w, r, "/", 301)
@@ -164,12 +178,12 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	log.Println("Server started on: http://localhost:8080")
-	http.HandleFunc("/", Index)
-	http.HandleFunc("/show", Show)
-	http.HandleFunc("/new", New)
-	http.HandleFunc("/insert", Insert)
-	http.HandleFunc("/edit", Edit)
-	http.HandleFunc("/update", Update)
-	http.HandleFunc("/delete", Delete)
-	http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/", Index)	       // start page
+	http.HandleFunc("/show", Show)     // showing records from database
+	http.HandleFunc("/new", New)       // Create new records
+	http.HandleFunc("/insert", Insert) // Insert new records
+	http.HandleFunc("/edit", Edit)     // Edit details of specific records
+	http.HandleFunc("/update", Update) // update details of specifice records
+	http.HandleFunc("/delete", Delete) // delete records from database
+	http.ListenAndServe(":8080", nil) // set port for server
 }
