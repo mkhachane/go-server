@@ -27,7 +27,11 @@ type User struct {
 
 //Connection of mysql database
 func dbConn() (db *sql.DB) {
-	db, err := sql.Open("mysql", "root:root@/packages")
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbPass := "root"
+	dbName := "packages"
+	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -64,10 +68,16 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 }
 
-//Login page
+//This for get price of package which selected when order
 func loginPage(w http.ResponseWriter, r *http.Request) {
 	price = r.URL.Query().Get("price")
-	fmt.Println(price)
+	t, _ := template.ParseFiles("login_page.html")
+	t.Execute(w, nil)
+
+}
+
+//This for login_page template for update user
+func logTemp(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("login_page.html")
 	t.Execute(w, nil)
 
@@ -108,7 +118,7 @@ func newEntry(w http.ResponseWriter, r *http.Request) {
 //Add new user to database
 func adduser(w http.ResponseWriter, r *http.Request)  {
 	db := dbConn()
-	redirectTarget := "/login_page"
+	redirectTarget := "/temp"
 	if r.Method == "POST" {
 		uname := r.FormValue("uname")
 		pwd   := r.FormValue("pwd")
@@ -170,6 +180,7 @@ func main() {
 	http.HandleFunc("/", Index)               //start page
 	http.HandleFunc("/login", loginHandler)   //Login authentication
 	http.HandleFunc("/login_page", loginPage) //Login page template
+	http.HandleFunc("/temp", logTemp)		  //redirect Login template after adduser
 	http.HandleFunc("/new", newEntry)         //For new entry template
 	http.HandleFunc("/insert", adduser)       //Add user function
 	http.HandleFunc("/details", orderDetails) //details of orders
