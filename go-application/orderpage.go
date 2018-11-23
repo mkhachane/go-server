@@ -137,7 +137,7 @@ func adduser(w http.ResponseWriter, r *http.Request)  {
 		fmt.Printf("\nres: %v", res)
 	}
 	defer db.Close()
-	http.Redirect(w,r,redirectTarget,200)
+	http.Redirect(w,r,redirectTarget,302)
 
 }
 
