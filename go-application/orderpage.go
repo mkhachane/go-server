@@ -151,6 +151,11 @@ func adduser(w http.ResponseWriter, r *http.Request) {
 		log.Printf("redirect to: %s", redirectTarget)
 		http.Redirect(w, r, redirectTarget, 301)
 	}
+<<<<<<< HEAD
+=======
+	defer db.Close()
+	http.Redirect(w,r,redirectTarget,302)
+>>>>>>> d5583a05395668ee553fbb1e9d7e0a79d4c55448
 
 }
 

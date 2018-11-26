@@ -20,7 +20,7 @@ type Employee struct {
 	Sal int
 }
 
-//database connection
+//database connection using ENV vars
 func dbConn() (*sql.DB, error) {
 	dbDriver := os.Getenv("DB_DRIVER")
 	dbUser := os.Getenv("DB_USER")
