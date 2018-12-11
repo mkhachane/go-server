@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> <title>CRUD</title></head>
+<body>
+<main>
+    <header>
+        <div> <h1 style="background: lightgrey"><a>CRUD</a></h1> </div>
+        <a href="/">HOME</a>
+        <div> <span><h2 style="background: darkseagreen">crud operations</h2></span> </div>
+    </header>
+        <div>
+            <table border="1" >
+                <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Dept</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Sal</th>
+                    <th scope="col">View</th>
+                    <th scope="col">Update</th>
+                    <th scope="col">Delete</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ range .}}
+                    <tr>
+                        <td>{{ .Id }}</td>
+                        <td>{{ .Name }}</td>
+                        <td>{{ .Dept }}</td>
+                        <td>{{ .City }}</td>
+                        <td>{{ .Sal }}</td>
+                        <td><a href="/show?id={{ .Id }}">View</a></td>
+                        <td><a href="/edit?id={{ .Id }}">Update</a></td>
+                        <td><a href="/delete?id={{ .Id }}">Delete</a><td>
+                    </tr>
+                {{ end }}
+                </tbody>
+            </table>
+            <br>
+            <h3 style="background: aliceblue">Click here for new entry:- </h3>
+            <a href="/new">New Entry</a>
+        </div>
+</main>
+</body>
+</html>
